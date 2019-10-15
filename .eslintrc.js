@@ -10,7 +10,8 @@ module.exports = {
     'react/prop-types': 'off',
     'comma-dangle': 'off',
     'react/state-in-constructor': 'off',
-    'arrow-parens': 'off'
+    'arrow-parens': 'off',
+    'react/destructuring-assignment': 'off'
   },
   globals: {
     fetch: false

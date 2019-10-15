@@ -7,14 +7,14 @@ import { createStackNavigator } from 'react-navigation-stack';
 import * as Font from 'expo-font';
 
 import Home from './screens/home';
-import SignUp from './screens/signup';
+import Signup from './screens/signup';
 import Login from './screens/login';
 import Start from './screens/start';
 import AuthLoading from './screens/authloading';
 
 const AppStack = createStackNavigator({ Home });
 const AuthStack = createStackNavigator(
-  { Start, Login, SignUp },
+  { Start, Login, Signup },
   {
     headerMode: 'none',
     navigationOptions: {

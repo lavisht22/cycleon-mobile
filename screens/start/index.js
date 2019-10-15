@@ -46,8 +46,16 @@ export default class Start extends React.Component {
             <Text style={styles.cycleon}>Cycle-On!</Text>
           </View>
           <View>
-            <Button style={{ marginBottom: 20 }} text="Login" />
-            <Button border text="Signup" />
+            <Button
+              style={{ marginBottom: 20 }}
+              text="Login"
+              onPress={() => this.props.navigation.navigate('Login')}
+            />
+            <Button
+              border
+              text="Signup"
+              onPress={() => this.props.navigation.navigate('Signup')}
+            />
           </View>
         </View>
       </View>
