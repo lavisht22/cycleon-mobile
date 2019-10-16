@@ -24,7 +24,16 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.cycleon.mobile"
+    },
+    "android": {
+      "package": "com.cycleon.mobile",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCXtKBEWDiJ9mThK5n7Isoi6-5jZtg0DLg"
+        }
+      }
     }
   }
 }

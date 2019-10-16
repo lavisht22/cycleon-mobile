@@ -12,7 +12,15 @@ import Login from './screens/login';
 import Start from './screens/start';
 import AuthLoading from './screens/authloading';
 
-const AppStack = createStackNavigator({ Home });
+const AppStack = createStackNavigator(
+  { Home },
+  {
+    headerMode: 'none',
+    navigationOptions: {
+      headerVisible: false
+    }
+  }
+);
 const AuthStack = createStackNavigator(
   { Start, Login, Signup },
   {
@@ -46,7 +54,7 @@ class App extends React.Component {
           Auth: AuthStack
         },
         {
-          initialRouteName: 'AuthLoading'
+          initialRouteName: 'App'
         }
       )
     );
