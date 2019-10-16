@@ -3,6 +3,7 @@ import React from 'react';
 import { Text, View, StyleSheet, Dimensions } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import Button from '../Button';
+import DurationSelector from '../DurationSelector';
 
 export default class MailCarousel extends React.Component {
   state = {
@@ -32,10 +33,9 @@ export default class MailCarousel extends React.Component {
                     <Text style={styles.cycleId}>{item.cycle_id}</Text>
                     <Text style={styles.cycleName}>{item.cycle_name}</Text>
                   </View>
-                  <View style={styles.durationButtons}>
-                    <Button style={{ flex: 1 }} border text="1 Hr" />
-                    <Button style={{ flex: 1 }} border text="2 Hr" />
-                    <Button style={{ flex: 1 }} border text="3 Hr" />
+                  <View>
+                    <Text style={styles.durationText}>Duration</Text>
+                    <DurationSelector />
                   </View>
                 </View>
                 <Button text="Book" />
@@ -45,6 +45,7 @@ export default class MailCarousel extends React.Component {
           sliderWidth={this.state.screenWidth}
           itemWidth={0.8 * this.state.screenWidth}
           onSnapToItem={index => this.setState({ activeSlide: index })}
+          index={this.state.activeSlide}
         />
         <Pagination
           dotsLength={this.props.items.length}
@@ -87,8 +88,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
-  durationButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+  durationText: {
+    fontFamily: 'poppins-regular',
+    fontSize: 16,
+    marginBottom: 10
   }
 });

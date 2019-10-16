@@ -39,7 +39,8 @@ class App extends React.Component {
   async componentDidMount() {
     await Font.loadAsync({
       'poppins-regular': require('./assets/poppins/Poppins-Regular.ttf'),
-      'poppins-bold': require('./assets/poppins/Poppins-Bold.ttf')
+      'poppins-bold': require('./assets/poppins/Poppins-Bold.ttf'),
+      'poppins-thin': require('./assets/poppins/Poppins-Thin.ttf')
     });
 
     this.setState({ fontsLoaded: true });
