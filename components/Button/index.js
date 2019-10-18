@@ -3,7 +3,7 @@ import { TouchableWithoutFeedback, Text, StyleSheet, View } from 'react-native';
 import Gradient from '../Gradient';
 
 export default function Button(props) {
-  const { onPress, text, style, border } = props;
+  const { onPress, text, style, border, altText } = props;
 
   let internalViewStyles;
 
@@ -11,13 +11,17 @@ export default function Button(props) {
     internalViewStyles = {
       padding: 15,
       borderRadius: 12,
-      backgroundColor: 'rgba(15, 32, 39, 1)'
+      backgroundColor: 'rgba(15, 32, 39, 1)',
+      flexDirection: 'row',
+      justifyContent: 'space-between'
     };
   } else {
     internalViewStyles = {
       padding: 15,
       borderRadius: 12,
-      backgroundColor: '#transparent'
+      backgroundColor: '#transparent',
+      flexDirection: 'row',
+      justifyContent: 'space-between'
     };
   }
 
@@ -27,6 +31,7 @@ export default function Button(props) {
         <Gradient gradientColor="orange" style={styles.gradient}>
           <View style={internalViewStyles}>
             <Text style={styles.text}>{text}</Text>
+            {altText ? <Text style={styles.altText}>{altText}</Text> : null}
           </View>
         </Gradient>
       </View>
@@ -44,6 +49,11 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: 'poppins-bold',
+    fontSize: 18,
+    color: '#fff'
+  },
+  altText: {
+    fontFamily: 'poppins-regular',
     fontSize: 18,
     color: '#fff'
   }

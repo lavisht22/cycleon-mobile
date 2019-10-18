@@ -7,6 +7,7 @@ import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 
 import Carousel from '../../components/Carousel';
+import Header from '../../components/Header';
 
 const mapStyle = [
   {
@@ -324,6 +325,7 @@ export default class Home extends React.Component {
     return (
       <View style={styles.container}>
         <StatusBar animated hidden />
+        <Header leftIcon="ios-menu" headerText="Cycle-On" />
         <View style={styles.mapContainer}>
           {this.state.location !== null ? (
             <MapView

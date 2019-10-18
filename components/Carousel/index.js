@@ -38,7 +38,7 @@ export default class MailCarousel extends React.Component {
                     <DurationSelector />
                   </View>
                 </View>
-                <Button text="Book" />
+                <Button text="Book" altText="₹10/-" />
               </View>
             );
           }}
