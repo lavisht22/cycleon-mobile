@@ -49,7 +49,10 @@ export default class Login extends React.Component {
             </View>
           </View>
           <View>
-            <Button text="Login" />
+            <Button
+              onPress={() => this.props.navigation.navigate('Home')}
+              text="Login"
+            />
           </View>
         </View>
       </View>

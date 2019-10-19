@@ -38,7 +38,13 @@ export default class MailCarousel extends React.Component {
                     <DurationSelector />
                   </View>
                 </View>
-                <Button text="Book" altText="₹10/-" />
+                <Button
+                  onPress={() => {
+                    this.props.navigation.navigate('Trip');
+                  }}
+                  text="Book"
+                  altText="₹10/-"
+                />
               </View>
             );
           }}

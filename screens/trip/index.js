@@ -1,13 +1,16 @@
 import React from 'react';
-import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, Platform, View, Text, StatusBar } from 'react-native';
+import MapView, { Polyline } from 'react-native-maps';
+import {
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  TouchableWithoutFeedback
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Constants from 'expo-constants';
-import * as Location from 'expo-location';
-import * as Permissions from 'expo-permissions';
 
-import Carousel from '../../components/Carousel';
 import Header from '../../components/Header';
+import Button from '../../components/Button';
 
 const mapStyle = [
   {
@@ -223,101 +226,40 @@ const mapStyle = [
   }
 ];
 
+const coordinates = [
+  {
+    latitude: 30.353261,
+    longitude: 76.360746
+  },
+  {
+    latitude: 30.353481,
+    longitude: 76.362636
+  },
+  {
+    latitude: 30.353697,
+    longitude: 76.364833
+  },
+  {
+    latitude: 30.354236,
+    longitude: 76.369899
+  },
+  {
+    latitude: 30.351693,
+    longitude: 76.370456
+  },
+  {
+    latitude: 30.352036,
+    longitude: 76.373513
+  }
+];
+
 export default class Home extends React.Component {
   state = {
-    location: null,
-    errorMessage: null,
     region: {
       latitude: 30.3524,
       longitude: 76.3612,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01
-    },
-    markers: [
-      {
-        cycle_id: '123N',
-        cycle_name: 'Hero Razorback',
-        coordinates: {
-          latitude: 30.352887,
-          longitude: 76.369662
-        }
-      },
-      {
-        cycle_id: '223M',
-        cycle_name: 'BMS',
-        coordinates: {
-          latitude: 30.354646,
-          longitude: 76.366358
-        }
-      }
-    ]
-  };
-
-  componentDidMount() {
-    if (Platform.OS === 'android' && !Constants.isDevice) {
-      this.setState({
-        errorMessage:
-          'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
-      });
-    } else {
-      this.getLocationAsync();
-    }
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.watcher);
-  }
-
-  watchLocation = () => {
-    this.watcher = setInterval(async () => {
-      let location;
-      try {
-        location = await Location.getCurrentPositionAsync({});
-        this.setState({
-          location,
-          region: {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01
-          }
-        });
-      } catch (error) {
-        this.setState({
-          location: null,
-          errorMessage: 'Please enable location service to view nearby cycles'
-        });
-      }
-    }, 100);
-  };
-
-  getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-
-    if (status !== 'granted') {
-      this.setState({
-        errorMessage:
-          'Please grant permission to access location to view nearby cycles'
-      });
-    }
-
-    let location;
-    try {
-      location = await Location.getCurrentPositionAsync({});
-      this.setState({
-        location,
-        region: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01
-        }
-      });
-      this.watchLocation();
-    } catch (error) {
-      this.setState({
-        errorMessage: 'Please enable location service to view nearby cycles'
-      });
     }
   };
 
@@ -325,40 +267,75 @@ export default class Home extends React.Component {
     return (
       <View style={styles.container}>
         <StatusBar animated hidden />
-        <Header leftIcon="ios-menu" headerText="Cycle-On" />
+        <Header leftIcon="ios-menu" headerText="Trip Details" />
         <View style={styles.mapContainer}>
-          {this.state.location !== null ? (
-            <MapView
-              initialRegion={this.state.region}
-              style={styles.map}
-              showsUserLocation
-              onUserLocationChange={this.onUserLocationChange}
-              customMapStyle={mapStyle}
-            >
-              {this.state.markers.map(marker => (
-                <Marker
-                  key={marker.cycle_id}
-                  coordinate={marker.coordinates}
-                  title={marker.cycle_id}
-                  description={marker.cycle_name}
-                  image={require('../../assets/icon_small.png')}
-                />
-              ))}
-            </MapView>
-          ) : (
-            <Text>{this.state.errorMessage}</Text>
-          )}
+          <MapView
+            initialRegion={this.state.region}
+            style={styles.map}
+            onUserLocationChange={this.onUserLocationChange}
+            customMapStyle={mapStyle}
+          >
+            <Polyline
+              coordinates={coordinates}
+              strokeWidth={3}
+              strokeColor="rgba(255, 81, 47, 1)"
+            />
+          </MapView>
         </View>
         <LinearGradient
           colors={['rgba(36, 47, 62, 1)', 'rgba(15, 32, 39, 1)']}
           locations={[0, 1]}
-          style={{ height: '45%' }}
+          style={{ height: '60%' }}
         >
           <View style={styles.content}>
-            <Carousel
-              items={this.state.markers}
-              navigation={this.props.navigation}
-            />
+            <View>
+              <View style={styles.tripDetails}>
+                <View
+                  style={{
+                    ...styles.tripDetail,
+                    borderRightWidth: 1,
+                    borderRightColor: '#C0C0C0'
+                  }}
+                >
+                  <Text style={styles.smallText}>Start Time</Text>
+                  <Text style={styles.largeText}>09:55 AM</Text>
+                </View>
+
+                <View style={styles.tripDetail}>
+                  <Text style={styles.smallText}>End Time</Text>
+                  <Text style={styles.largeText}>--:-- --</Text>
+                </View>
+              </View>
+              <View style={styles.paymentDetails}>
+                <View style={styles.paymentItem}>
+                  <Text style={styles.paymentItemName}>Trip Cost</Text>
+                  <Text style={styles.paymentItemPrice}>₹10</Text>
+                </View>
+                <View style={styles.paymentItem}>
+                  <Text style={styles.paymentItemName}>
+                    Available Wallet Balance
+                  </Text>
+                  <Text style={styles.paymentItemPrice}>₹100</Text>
+                </View>
+              </View>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  this.props.navigation.navigate('Recharge');
+                }}
+              >
+                <Text style={styles.rechargeText}>Recharge Now!</Text>
+              </TouchableWithoutFeedback>
+            </View>
+            <View styles={styles.buttons}>
+              <Button style={{ marginBottom: 20 }} text="Lock Cycle" />
+              <Button
+                onPress={() => {
+                  this.props.navigation.navigate('Home');
+                }}
+                border
+                text="End Trip"
+              />
+            </View>
           </View>
         </LinearGradient>
       </View>
@@ -372,16 +349,59 @@ const styles = StyleSheet.create({
     backgroundColor: '#242f3e'
   },
   mapContainer: {
-    height: '55%'
+    height: '40%'
   },
   map: {
     flex: 1
   },
   content: {
     width: '100%',
-    paddingTop: 20,
+    padding: 20,
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between'
+  },
+  tripDetails: {
+    flexDirection: 'row'
+  },
+  tripDetail: {
+    flex: 1,
+    padding: 10,
     alignItems: 'center'
+  },
+  smallText: {
+    fontFamily: 'poppins-regular',
+    fontSize: 16,
+    color: 'white'
+  },
+  largeText: {
+    fontFamily: 'poppins-bold',
+    fontSize: 30,
+    color: '#FF512F'
+  },
+  paymentDetails: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    marginTop: 20
+  },
+  paymentItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  paymentItemName: {
+    fontFamily: 'poppins-regular',
+    fontSize: 14
+  },
+  paymentItemPrice: {
+    fontFamily: 'poppins-bold',
+    fontSize: 16,
+    color: '#FF512F'
+  },
+  rechargeText: {
+    fontFamily: 'poppins-regular',
+    fontSize: 16,
+    color: '#FF512F',
+    marginLeft: 10,
+    marginTop: 5
   }
 });

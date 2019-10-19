@@ -1,23 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
+const colorsNormal = ['rgba(15, 32, 39, 1)', 'rgba(36, 47, 62, 0.5)'];
+const colorsTransparent = ['rgba(15, 32, 39, 0)', 'rgba(36, 47, 62, 0)'];
+
 export default function Header(props) {
-  const { headerText, leftIcon, rightIcon } = props;
+  const { headerText, leftIcon, leftIconPress, rightIcon, transparent } = props;
   return (
     <LinearGradient
-      colors={['rgba(15, 32, 39, 1)', 'rgba(36, 47, 62, 0.5)']}
+      colors={transparent ? colorsTransparent : colorsTransparent}
       locations={[0, 1]}
       style={styles.gradient}
     >
       {leftIcon ? (
-        <Ionicons
-          style={styles.leftIcon}
-          name={leftIcon}
-          size={30}
-          color="white"
-        />
+        <TouchableWithoutFeedback onPress={leftIconPress}>
+          <Ionicons
+            style={styles.leftIcon}
+            name={leftIcon}
+            size={30}
+            color="white"
+          />
+        </TouchableWithoutFeedback>
       ) : null}
       <View style={styles.headerTextContainer}>
         <Text style={styles.headerText}>{headerText}</Text>
