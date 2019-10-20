@@ -24,6 +24,7 @@ const AppStack = createStackNavigator(
     }
   }
 );
+
 const AuthStack = createStackNavigator(
   { Start, Login, Signup },
   {

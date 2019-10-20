@@ -1,6 +1,15 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-underscore-dangle */
 import React from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, Platform, View, Text, StatusBar } from 'react-native';
+import {
+  StyleSheet,
+  Platform,
+  View,
+  Text,
+  StatusBar,
+  BackHandler
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
@@ -8,6 +17,7 @@ import * as Permissions from 'expo-permissions';
 
 import Carousel from '../../components/Carousel';
 import Header from '../../components/Header';
+import Menu from '../../components/Menu';
 
 const mapStyle = [
   {
@@ -223,8 +233,15 @@ const mapStyle = [
   }
 ];
 
+let drawer;
+
 export default class Home extends React.Component {
+  _didFocusSubscription;
+
+  _willBlurSubscription;
+
   state = {
+    drawerVisible: false,
     location: null,
     errorMessage: null,
     region: {
@@ -253,6 +270,18 @@ export default class Home extends React.Component {
     ]
   };
 
+  constructor(props) {
+    super(props);
+    this._didFocusSubscription = props.navigation.addListener(
+      'didFocus',
+      payload =>
+        BackHandler.addEventListener(
+          'hardwareBackPress',
+          this.onBackButtonPressAndroid
+        )
+    );
+  }
+
   componentDidMount() {
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
@@ -262,11 +291,30 @@ export default class Home extends React.Component {
     } else {
       this.getLocationAsync();
     }
+    this._willBlurSubscription = this.props.navigation.addListener(
+      'willBlur',
+      payload =>
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          this.onBackButtonPressAndroid
+        )
+    );
   }
 
   componentWillUnmount() {
     clearInterval(this.watcher);
+    this._didFocusSubscription && this._didFocusSubscription.remove();
+    this._willBlurSubscription && this._willBlurSubscription.remove();
   }
+
+  onBackButtonPressAndroid = () => {
+    if (drawer.state.visible) {
+      drawer.slideBack();
+    } else {
+      this.props.navigation.goBack();
+    }
+    return true;
+  };
 
   watchLocation = () => {
     this.watcher = setInterval(async () => {
@@ -292,7 +340,7 @@ export default class Home extends React.Component {
   };
 
   getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    const { status } = await Permissions.askAsync(Permissions.LOCATION);
 
     if (status !== 'granted') {
       this.setState({
@@ -321,11 +369,25 @@ export default class Home extends React.Component {
     }
   };
 
+  setDrawerRef = drawerRef => {
+    drawer = drawerRef;
+  };
+
   render() {
     return (
       <View style={styles.container}>
+        <Menu
+          ref={this.setDrawerRef}
+          drawerVisible={this.state.drawerVisible}
+        />
         <StatusBar animated hidden />
-        <Header leftIcon="ios-menu" headerText="Cycle-On" />
+        <Header
+          leftIcon="ios-menu"
+          leftIconPress={() => {
+            drawer.slide();
+          }}
+          headerText="Cycle-On"
+        />
         <View style={styles.mapContainer}>
           {this.state.location !== null ? (
             <MapView
