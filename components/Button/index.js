@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableWithoutFeedback, Text, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import Gradient from '../Gradient';
 
 export default function Button(props) {
@@ -26,7 +26,7 @@ export default function Button(props) {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={onPress}>
+    <TouchableOpacity onPress={onPress}>
       <View style={{ ...styles.button, ...style }}>
         <Gradient gradientColor="orange" style={styles.gradient}>
           <View style={internalViewStyles}>
@@ -35,7 +35,7 @@ export default function Button(props) {
           </View>
         </Gradient>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 }
 
