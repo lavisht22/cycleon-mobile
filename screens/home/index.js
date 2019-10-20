@@ -243,7 +243,7 @@ export default class Home extends React.Component {
   state = {
     drawerVisible: false,
     location: null,
-    errorMessage: null,
+    errorMessage: 'Fetching your location...',
     region: {
       latitude: 30.3524,
       longitude: 76.3612,
@@ -283,6 +283,7 @@ export default class Home extends React.Component {
   }
 
   componentDidMount() {
+    console.log('Did Mount');
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage:
@@ -316,6 +317,39 @@ export default class Home extends React.Component {
     return true;
   };
 
+  getLocationAsync = async () => {
+    console.log('get Location');
+    const { status } = await Permissions.askAsync(Permissions.LOCATION);
+    console.log(status);
+
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage:
+          'Please grant permission to access location to view nearby cycles'
+      });
+    }
+
+    let location;
+    try {
+      location = await Location.getCurrentPositionAsync({});
+      console.log(location);
+      this.setState({
+        location,
+        region: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01
+        }
+      });
+      this.watchLocation();
+    } catch (error) {
+      this.setState({
+        errorMessage: 'Please enable location service to view nearby cycles'
+      });
+    }
+  };
+
   watchLocation = () => {
     this.watcher = setInterval(async () => {
       let location;
@@ -337,36 +371,6 @@ export default class Home extends React.Component {
         });
       }
     }, 100);
-  };
-
-  getLocationAsync = async () => {
-    const { status } = await Permissions.askAsync(Permissions.LOCATION);
-
-    if (status !== 'granted') {
-      this.setState({
-        errorMessage:
-          'Please grant permission to access location to view nearby cycles'
-      });
-    }
-
-    let location;
-    try {
-      location = await Location.getCurrentPositionAsync({});
-      this.setState({
-        location,
-        region: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01
-        }
-      });
-      this.watchLocation();
-    } catch (error) {
-      this.setState({
-        errorMessage: 'Please enable location service to view nearby cycles'
-      });
-    }
   };
 
   setDrawerRef = drawerRef => {
@@ -394,8 +398,10 @@ export default class Home extends React.Component {
               initialRegion={this.state.region}
               style={styles.map}
               showsUserLocation
-              onUserLocationChange={this.onUserLocationChange}
               customMapStyle={mapStyle}
+              showsCompass={false}
+              showsMyLocationButton
+              loadingEnabled
             >
               {this.state.markers.map(marker => (
                 <Marker
@@ -408,7 +414,9 @@ export default class Home extends React.Component {
               ))}
             </MapView>
           ) : (
-            <Text>{this.state.errorMessage}</Text>
+            <View style={styles.textContainer}>
+              <Text style={styles.mapText}>{this.state.errorMessage}</Text>
+            </View>
           )}
         </View>
         <LinearGradient
@@ -445,5 +453,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  textContainer: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  mapText: {
+    fontFamily: 'poppins-regular',
+    fontSize: 14,
+    color: 'white'
   }
 });

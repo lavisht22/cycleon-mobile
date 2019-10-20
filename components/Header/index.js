@@ -10,7 +10,7 @@ export default function Header(props) {
   const { headerText, leftIcon, leftIconPress, rightIcon, transparent } = props;
   return (
     <LinearGradient
-      colors={transparent ? colorsTransparent : colorsTransparent}
+      colors={transparent ? colorsTransparent : colorsNormal}
       locations={[0, 1]}
       style={styles.gradient}
     >

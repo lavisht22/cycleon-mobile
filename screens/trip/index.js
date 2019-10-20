@@ -272,7 +272,6 @@ export default class Home extends React.Component {
           <MapView
             initialRegion={this.state.region}
             style={styles.map}
-            onUserLocationChange={this.onUserLocationChange}
             customMapStyle={mapStyle}
           >
             <Polyline

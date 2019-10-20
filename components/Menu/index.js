@@ -15,7 +15,7 @@ import Navigation from './navigation';
 class Menu extends React.Component {
   state = {
     visible: false,
-    x: new Animated.Value(1)
+    x: new Animated.Value(0)
   };
 
   slide = () => {
