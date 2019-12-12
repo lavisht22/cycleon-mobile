@@ -1,10 +1,10 @@
-import { signup, verify } from '../utils/service';
+import { login, verify } from '../utils/service';
 
-export function userSignup(name, phone) {
+export function userLogin(phone) {
   return {
-    type: 'SIGNUP',
+    type: 'LOGIN',
     payload: {
-      promise: signup(name, phone)
+      promise: login(phone)
     }
   };
 }

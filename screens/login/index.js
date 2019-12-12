@@ -1,20 +1,34 @@
+/* eslint-disable implicit-arrow-linebreak */
 import React from 'react';
 import { StyleSheet, Text, View, Image, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { connect } from 'react-redux';
 import Button from '../../components/Button';
 import TextInput from '../../components/TextInput';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import * as loginActions from '../../actions/login';
+import NavigationService from '../../utils/NavigationService';
+import { storeToken } from '../../utils/service';
 
 const backgroundImage = require('../../assets/bicycle_wallpaper.jpg');
-const bike = require('../../assets/bike.json');
 
-export default class Login extends React.Component {
-  componentDidMount() {
-    console.log('Login Mount');
+class Login extends React.Component {
+  state = {
+    phone: '',
+    otp: ''
+  };
+
+  async componentDidUpdate() {
+    if (this.props.verified) {
+      await storeToken(this.props.token);
+      NavigationService.navigate('App');
+    }
   }
 
   render() {
     return (
       <View style={styles.container}>
+        {this.props.loading ? <LoadingIndicator /> : null}
         <StatusBar animated hidden />
         <LinearGradient
           colors={[
@@ -33,32 +47,94 @@ export default class Login extends React.Component {
           }}
         />
         <Image style={styles.backgroundImage} source={backgroundImage} />
-        <View style={styles.content}>
-          <View>
-            <Text style={styles.heading}>Login</Text>
-            <Text style={styles.heading2}>Phone Number</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.heading3}>+91 - </Text>
-              <TextInput
-                editable
-                maxLength={10}
-                placeholder="8888888888"
-                keyboardType="phone-pad"
-                style={styles.textInputStyle}
+        {this.props.verification ? (
+          <View style={styles.content}>
+            <View>
+              <Text style={styles.heading}>Login</Text>
+              <Text style={styles.heading2}>OTP</Text>
+              <View style={styles.inputContainer}>
+                <Text style={styles.heading3}> </Text>
+                <TextInput
+                  editable
+                  maxLength={4}
+                  placeholder="8888"
+                  keyboardType="number-pad"
+                  style={styles.textInputStyle}
+                  value={this.state.otp}
+                  onChangeText={text => {
+                    this.setState({ otp: text });
+                  }}
+                />
+                {this.props.error ? (
+                  <Text style={styles.errorMessage}>
+                    {this.props.errorMessage}
+                  </Text>
+                ) : null}
+              </View>
+            </View>
+            <View>
+              <Button
+                text="Verify"
+                onPress={() => {
+                  this.props.userVerify(this.state.phone, this.state.otp);
+                }}
               />
             </View>
           </View>
-          <View>
-            <Button
-              onPress={() => this.props.navigation.navigate('Home')}
-              text="Login"
-            />
+        ) : (
+          <View style={styles.content}>
+            <View>
+              <Text style={styles.heading}>Login</Text>
+              <Text style={styles.heading2}>Phone Number</Text>
+              <View style={styles.inputContainer}>
+                <Text style={styles.heading3}>+91 - </Text>
+                <TextInput
+                  editable
+                  maxLength={10}
+                  placeholder="8888888888"
+                  keyboardType="phone-pad"
+                  style={styles.textInputStyle}
+                  value={this.state.phone}
+                  onChangeText={text => {
+                    this.setState({ phone: text });
+                  }}
+                />
+              </View>
+              {this.props.error ? (
+                <Text style={styles.errorMessage}>
+                  {this.props.errorMessage}
+                </Text>
+              ) : null}
+            </View>
+            <View>
+              <Button
+                text="Login"
+                onPress={() => {
+                  this.props.userLogin(this.state.phone);
+                }}
+              />
+            </View>
           </View>
-        </View>
+        )}
       </View>
     );
   }
 }
+
+const mapStateToProps = state => ({
+  loading: state.login.loading,
+  error: state.login.error,
+  errorMessage: state.login.errorMessage,
+  verification: state.login.verification,
+  verified: state.login.verified,
+  token: state.login.token
+});
+
+const mapDispatchToProps = {
+  ...loginActions
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
 
 const styles = StyleSheet.create({
   container: {
@@ -118,5 +194,11 @@ const styles = StyleSheet.create({
     fontFamily: 'poppins-regular',
     fontSize: 25,
     color: 'white'
+  },
+  errorMessage: {
+    fontFamily: 'poppins-regular',
+    fontSize: 15,
+    color: '#FF512F',
+    marginTop: 15
   }
 });

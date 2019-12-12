@@ -11,20 +11,20 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case 'SIGNUP_PENDING':
+    case 'LOGIN_PENDING':
       return {
         ...state,
         loading: true,
         error: false
       };
-    case 'SIGNUP_REJECTED':
+    case 'LOGIN_REJECTED':
       return {
         ...state,
         loading: false,
         error: true,
         errorMessage: extractErrorMessage(action)
       };
-    case 'SIGNUP_FULFILLED':
+    case 'LOGIN_FULFILLED':
       return {
         ...state,
         loading: false,

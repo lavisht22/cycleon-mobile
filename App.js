@@ -7,6 +7,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import * as Font from 'expo-font';
 import { Provider } from 'react-redux';
 
+import NavigationService from './utils/NavigationService';
 import Home from './screens/home';
 import Signup from './screens/signup';
 import Login from './screens/login';
@@ -70,11 +71,15 @@ class App extends React.Component {
 
     return fontsLoaded ? (
       <Provider store={Store}>
-        <Cycleon />
+        <Cycleon
+          ref={navigatorRef => {
+            NavigationService.setTopLevelNavigator(navigatorRef);
+          }}
+        />
       </Provider>
     ) : (
       <View>
-        <Text>Loading</Text>
+        <Text>Loading...</Text>
       </View>
     );
   }

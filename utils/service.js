@@ -1,5 +1,6 @@
+/* eslint-disable operator-linebreak */
 import axios from 'axios';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage } from 'react-native';
 
 const CONFIG = {
   SERVICE_URL: 'https://cycle-on.herokuapp.com'
@@ -68,6 +69,10 @@ export function verify(phone, otp) {
   );
 }
 
+export async function storeToken(token) {
+  await storeAsyncData('token', token);
+}
+
 const storeAsyncData = async (key, value) => {
   try {
     await AsyncStorage.setItem(key, value);
@@ -88,3 +93,16 @@ const loadAsyncData = async key => {
     // error reading value
   }
 };
+
+export function extractErrorMessage(action) {
+  if (
+    action &&
+    action.payload &&
+    action.payload.response &&
+    action.payload.response.data &&
+    action.payload.response.data.msg
+  ) {
+    return action.payload.response.data.msg;
+  }
+  return 'Unknown Error';
+}
