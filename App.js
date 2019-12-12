@@ -5,6 +5,7 @@ import { View, Text } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import * as Font from 'expo-font';
+import { Provider } from 'react-redux';
 
 import Home from './screens/home';
 import Signup from './screens/signup';
@@ -14,6 +15,7 @@ import AuthLoading from './screens/authloading';
 import Trip from './screens/trip';
 import Recharge from './screens/recharge';
 import Rides from './screens/rides';
+import Store from './utils/store';
 
 const AppStack = createStackNavigator(
   { Home, Trip, Recharge, Rides },
@@ -67,7 +69,9 @@ class App extends React.Component {
     const { fontsLoaded } = this.state;
 
     return fontsLoaded ? (
-      <Cycleon />
+      <Provider store={Store}>
+        <Cycleon />
+      </Provider>
     ) : (
       <View>
         <Text>Loading</Text>
