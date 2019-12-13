@@ -17,3 +17,9 @@ export function getUserProfile() {
     }
   };
 }
+
+export function resetStarter() {
+  return {
+    type: 'RESET_STARTER'
+  };
+}

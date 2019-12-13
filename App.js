@@ -15,11 +15,12 @@ import Start from './screens/start';
 import AuthLoading from './screens/authloading';
 import Trip from './screens/trip';
 import Recharge from './screens/recharge';
+import Starter from './screens/starter';
 import Rides from './screens/rides';
 import Store from './utils/store';
 
 const AppStack = createStackNavigator(
-  { Home, Trip, Recharge, Rides },
+  { Starter, Home, Trip, Recharge, Rides },
   {
     headerMode: 'none',
     navigationOptions: {

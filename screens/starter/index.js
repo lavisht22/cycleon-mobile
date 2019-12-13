@@ -1,23 +1,25 @@
 import React from 'react';
-import { AsyncStorage, StatusBar, View } from 'react-native';
+import { StatusBar, View } from 'react-native';
+import { connect } from 'react-redux';
+
 import LoadingIndicator from '../../components/LoadingIndicator';
+import * as starterActions from '../../actions/starter';
 
 class Starter extends React.Component {
   componentDidMount() {
-    this._bootstrapAsync();
+    this.props.getActiveTrip();
+    this.props.getUserProfile();
   }
 
-  // Fetch the token from storage then navigate to our appropriate place
-  _bootstrapAsync = async () => {
-    const userToken = await AsyncStorage.getItem('token');
-    console.log(userToken);
+  componentDidUpdate() {
+    if (this.props.completed && this.props.activeTrip) {
+      this.props.navigation.navigate('Trip');
+    } else if (this.props.completed && !this.props.activeTrip) {
+      this.props.navigation.navigate('Home');
+    }
+    this.props.resetStarter();
+  }
 
-    // This will switch to the App screen or Auth screen and this loading
-    // screen will be unmounted and thrown away.
-    this.props.navigation.navigate(userToken ? 'App' : 'Auth');
-  };
-
-  // Render any loading content that you like here
   render() {
     return (
       <View
@@ -35,4 +37,14 @@ class Starter extends React.Component {
   }
 }
 
-export default Starter;
+const mapStateToProps = state => ({
+  completed: state.starter.completed,
+  activeTrip: state.starter.activeTrip,
+  loading: state.starter.loading
+});
+
+const mapDispatchToProps = {
+  ...starterActions
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Starter);
