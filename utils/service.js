@@ -3,13 +3,14 @@ import axios from 'axios';
 import { AsyncStorage } from 'react-native';
 
 const CONFIG = {
-  SERVICE_URL: 'https://cycle-on.herokuapp.com'
+  SERVICE_URL: 'http://cycle-on.herokuapp.com'
 };
 
-function generateHeaders() {
+async function generateHeaders() {
+  const token = await loadAsyncData('token');
   return {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${loadAsyncData('token')}`
+    Authorization: `Bearer ${token}`
   };
 }
 
@@ -19,21 +20,21 @@ function generateHeadersWithoutAuth() {
   };
 }
 
-export function getData(path) {
+export async function getData(path) {
   return axios.get(`${CONFIG.SERVICE_URL}${path}`, {
-    headers: generateHeaders()
+    headers: await generateHeaders()
   });
 }
 
-export function postData(path, body) {
+export async function postData(path, body) {
   return axios.post(`${CONFIG.SERVICE_URL}${path}`, body, {
-    headers: generateHeaders()
+    headers: await generateHeaders()
   });
 }
 
-export function putData(path, body) {
+export async function putData(path, body) {
   return axios.put(`${CONFIG.SERVICE_URL}${path}`, body, {
-    headers: generateHeaders()
+    headers: await generateHeaders()
   });
 }
 

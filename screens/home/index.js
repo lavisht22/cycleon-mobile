@@ -14,10 +14,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
+import { connect } from 'react-redux';
 
+import LoadingIndicator from '../../components/LoadingIndicator';
 import Carousel from '../../components/Carousel';
 import Header from '../../components/Header';
 import Menu from '../../components/Menu';
+import * as homeActions from '../../actions/home';
 
 const mapStyle = [
   {
@@ -234,8 +237,13 @@ const mapStyle = [
 ];
 
 let drawer;
+class Home extends React.Component {
+  marker;
 
-export default class Home extends React.Component {
+  map;
+
+  carousel;
+
   _didFocusSubscription;
 
   _willBlurSubscription;
@@ -250,24 +258,8 @@ export default class Home extends React.Component {
       latitudeDelta: 0.01,
       longitudeDelta: 0.01
     },
-    markers: [
-      {
-        cycle_id: '123N',
-        cycle_name: 'Hero Razorback',
-        coordinates: {
-          latitude: 30.352887,
-          longitude: 76.369662
-        }
-      },
-      {
-        cycle_id: '223M',
-        cycle_name: 'BMS',
-        coordinates: {
-          latitude: 30.354646,
-          longitude: 76.366358
-        }
-      }
-    ]
+    activeCycle: 0,
+    selectedNum: 1
   };
 
   constructor(props) {
@@ -283,7 +275,7 @@ export default class Home extends React.Component {
   }
 
   componentDidMount() {
-    console.log('Did Mount');
+    this.props.getCycles();
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage:
@@ -300,6 +292,19 @@ export default class Home extends React.Component {
           this.onBackButtonPressAndroid
         )
     );
+    if (this.marker) {
+      this.marker.showCallout();
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.marker) {
+      this.marker.showCallout();
+    }
+
+    if (this.props.booked) {
+      this.props.navigation.navigate('Trip');
+    }
   }
 
   componentWillUnmount() {
@@ -318,9 +323,7 @@ export default class Home extends React.Component {
   };
 
   getLocationAsync = async () => {
-    console.log('get Location');
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
-    console.log(status);
 
     if (status !== 'granted') {
       this.setState({
@@ -332,7 +335,6 @@ export default class Home extends React.Component {
     let location;
     try {
       location = await Location.getCurrentPositionAsync({});
-      console.log(location);
       this.setState({
         location,
         region: {
@@ -342,7 +344,7 @@ export default class Home extends React.Component {
           longitudeDelta: 0.01
         }
       });
-      this.watchLocation();
+      //this.watchLocation();
     } catch (error) {
       this.setState({
         errorMessage: 'Please enable location service to view nearby cycles'
@@ -380,6 +382,7 @@ export default class Home extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        {this.props.loading ? <LoadingIndicator /> : null}
         <Menu
           ref={this.setDrawerRef}
           drawerVisible={this.state.drawerVisible}
@@ -395,6 +398,9 @@ export default class Home extends React.Component {
         <View style={styles.mapContainer}>
           {this.state.location !== null ? (
             <MapView
+              ref={ref => {
+                this.map = ref;
+              }}
               initialRegion={this.state.region}
               style={styles.map}
               showsUserLocation
@@ -402,16 +408,31 @@ export default class Home extends React.Component {
               showsCompass={false}
               showsMyLocationButton
               loadingEnabled
+              onRegionChangeComplete={() => {
+                if (this.marker) {
+                  this.marker.showCallout();
+                }
+              }}
             >
-              {this.state.markers.map(marker => (
-                <Marker
-                  key={marker.cycle_id}
-                  coordinate={marker.coordinates}
-                  title={marker.cycle_id}
-                  description={marker.cycle_name}
-                  image={require('../../assets/icon_small.png')}
-                />
-              ))}
+              {this.props.cycles.map((marker, index) => {
+                return (
+                  <Marker
+                    key={marker.cycle_id}
+                    coordinate={{
+                      latitude: parseFloat(marker.coord.latitude),
+                      longitude: parseFloat(marker.coord.longitude)
+                    }}
+                    title={marker.cycle_id}
+                    description={marker.name}
+                    image={require('../../assets/icon_small.png')}
+                    ref={ref => {
+                      if (index === this.state.activeCycle) {
+                        this.marker = ref;
+                      }
+                    }}
+                  />
+                );
+              })}
             </MapView>
           ) : (
             <View style={styles.textContainer}>
@@ -426,8 +447,38 @@ export default class Home extends React.Component {
         >
           <View style={styles.content}>
             <Carousel
-              items={this.state.markers}
+              getRef={ref => {
+                this.carousel = ref;
+              }}
+              items={this.props.cycles}
               navigation={this.props.navigation}
+              enableSnap
+              index={this.state.activeCycle}
+              changeDuration={num => {
+                this.setState({
+                  selectedNum: num
+                });
+              }}
+              selectedNum={this.state.selectedNum}
+              bookCycle={() => {
+                this.props.bookCycle(
+                  this.props.cycles[this.state.activeCycle].cycle_id,
+                  parseInt(this.state.selectedNum, 10)
+                );
+              }}
+              onSnapToItem={index => {
+                this.setState({
+                  activeCycle: index
+                });
+                this.map.animateToRegion({
+                  latitude: parseFloat(this.props.cycles[index].coord.latitude),
+                  longitude: parseFloat(
+                    this.props.cycles[index].coord.longitude
+                  ),
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01
+                });
+              }}
             />
           </View>
         </LinearGradient>
@@ -435,6 +486,20 @@ export default class Home extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  loading: state.home.loading,
+  error: state.home.error,
+  errorMessage: state.home.errorMessage,
+  cycles: state.home.cycles,
+  activeCycle: state.home.activeCycle
+});
+
+const mapDispatchToProps = {
+  ...homeActions
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
 const styles = StyleSheet.create({
   container: {

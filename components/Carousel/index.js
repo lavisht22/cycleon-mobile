@@ -7,8 +7,7 @@ import DurationSelector from '../DurationSelector';
 
 export default class MailCarousel extends React.Component {
   state = {
-    screenWidth: 1,
-    activeSlide: 0
+    screenWidth: 1
   };
 
   componentDidMount() {
@@ -21,9 +20,7 @@ export default class MailCarousel extends React.Component {
     return (
       <View>
         <Carousel
-          ref={c => {
-            this._carousel = c;
-          }}
+          ref={this.props.getRef}
           data={this.props.items}
           renderItem={({ item }) => {
             return (
@@ -31,17 +28,18 @@ export default class MailCarousel extends React.Component {
                 <View>
                   <View style={styles.cycleDetails}>
                     <Text style={styles.cycleId}>{item.cycle_id}</Text>
-                    <Text style={styles.cycleName}>{item.cycle_name}</Text>
+                    <Text style={styles.cycleName}>{item.name}</Text>
                   </View>
                   <View>
                     <Text style={styles.durationText}>Duration</Text>
-                    <DurationSelector />
+                    <DurationSelector
+                      selectedNum={this.props.selectedNum}
+                      changeDuration={num => this.props.changeDuration(num)}
+                    />
                   </View>
                 </View>
                 <Button
-                  onPress={() => {
-                    this.props.navigation.navigate('Trip');
-                  }}
+                  onPress={this.props.bookCycle}
                   text="Book"
                   altText="₹10/-"
                 />
@@ -50,12 +48,11 @@ export default class MailCarousel extends React.Component {
           }}
           sliderWidth={this.state.screenWidth}
           itemWidth={0.8 * this.state.screenWidth}
-          onSnapToItem={index => this.setState({ activeSlide: index })}
-          index={this.state.activeSlide}
+          onBeforeSnapToItem={this.props.onSnapToItem}
         />
         <Pagination
           dotsLength={this.props.items.length}
-          activeDotIndex={this.state.activeSlide}
+          activeDotIndex={this.props.index}
           containerStyle={{ backgroundColor: 'transparent' }}
           dotStyle={{
             width: 10,

@@ -1,17 +1,18 @@
+/* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import { TouchableWithoutFeedback, View, Text, StyleSheet } from 'react-native';
 
 export default class DurationSelector extends React.Component {
-  state = {
-    selectedDuration: 1
-  };
-
   render() {
-    const { selectedDuration } = this.state;
+    const selectedDuration = this.props.selectedNum;
 
     return (
       <View style={styles.durationSelector}>
-        <TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            this.props.changeDuration(1);
+          }}
+        >
           <View
             style={
               selectedDuration === 1
@@ -22,7 +23,11 @@ export default class DurationSelector extends React.Component {
             <Text style={styles.durationButtonText}>1 Hr</Text>
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            this.props.changeDuration(2);
+          }}
+        >
           <View
             style={
               selectedDuration === 2
@@ -33,7 +38,11 @@ export default class DurationSelector extends React.Component {
             <Text style={styles.durationButtonText}>2 Hr</Text>
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            this.props.changeDuration(3);
+          }}
+        >
           <View
             style={
               selectedDuration === 3
@@ -44,7 +53,11 @@ export default class DurationSelector extends React.Component {
             <Text style={styles.durationButtonText}>3 Hr</Text>
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            this.props.changeDuration(4);
+          }}
+        >
           <View
             style={
               selectedDuration === 4
