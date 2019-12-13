@@ -21,9 +21,8 @@ export function bookCycle(cycleId, duration) {
   };
 }
 
-export function updateActiveCycle(index) {
+export function resetHomeScreen() {
   return {
-    type: 'UPDATE_ACTIVE_CYCLE',
-    payload: index
+    type: 'RESET_HOME_SCREEN'
   };
 }

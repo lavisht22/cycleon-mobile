@@ -5,7 +5,6 @@ const initialState = {
   error: false,
   errorMessage: '',
   cycles: [],
-  activeCycle: 0,
   booked: false
 };
 
@@ -41,7 +40,6 @@ export default (state = initialState, action) => {
       };
 
     case 'BOOK_CYCLE_REJECTED':
-      console.log('REJECTED');
       return {
         ...state,
         loading: false,
@@ -56,12 +54,11 @@ export default (state = initialState, action) => {
         booked: true
       };
 
-    case 'UPDATE_ACTIVE_CYCLE': {
+    case 'RESET_HOME_SCREEN':
       return {
         ...state,
-        activeCycle: action.payload
+        booked: false
       };
-    }
 
     default:
       return state;

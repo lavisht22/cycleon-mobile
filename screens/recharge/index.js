@@ -7,14 +7,24 @@ import {
   TouchableWithoutFeedback,
   TextInput
 } from 'react-native';
+import { connect } from 'react-redux';
 
 import Button from '../../components/Button';
 import Header from '../../components/Header';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import * as rechargeActions from '../../actions/recharge';
 
-export default class Recharge extends React.Component {
+class Recharge extends React.Component {
   state = {
     amount: 0
   };
+
+  componentDidUpdate() {
+    if (this.props.rechargeDone) {
+      this.props.resetRecharge();
+      this.props.navigation.navigate('Home');
+    }
+  }
 
   increaseAmount = amount => {
     this.setState({ amount: this.state.amount + amount });
@@ -23,6 +33,7 @@ export default class Recharge extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        {this.props.loading ? <LoadingIndicator /> : null}
         <StatusBar animated hidden />
         <Header
           transparent
@@ -86,12 +97,33 @@ export default class Recharge extends React.Component {
               </View>
             </TouchableWithoutFeedback>
           </View>
+          {this.props.error ? (
+            <Text style={{ ...styles.amountText, marginTop: 10 }}>
+              {this.props.errorMessage}
+            </Text>
+          ) : null}
         </View>
-        <Button text="Pay Now" />
+        <Button
+          text="Pay Now"
+          onPress={() => this.props.rechargeAccount(this.state.amount)}
+        />
       </View>
     );
   }
 }
+
+const mapStateToProps = state => ({
+  loading: state.recharge.loading,
+  error: state.recharge.error,
+  errorMessage: state.recharge.errorMessage,
+  rechargeDone: state.recharge.rechargeDone
+});
+
+const mapDispatchToProps = {
+  ...rechargeActions
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Recharge);
 
 const styles = StyleSheet.create({
   container: {

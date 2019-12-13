@@ -303,6 +303,7 @@ class Home extends React.Component {
     }
 
     if (this.props.booked) {
+      this.props.resetHomeScreen();
       this.props.navigation.navigate('Trip');
     }
   }
