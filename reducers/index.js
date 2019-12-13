@@ -5,6 +5,7 @@ import home from './home';
 import recharge from './recharge';
 import starter from './starter';
 import trip from './trip';
+import rides from './rides';
 
 export default combineReducers({
   signup,
@@ -12,5 +13,6 @@ export default combineReducers({
   home,
   recharge,
   starter,
-  trip
+  trip,
+  rides
 });
