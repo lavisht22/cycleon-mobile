@@ -22,7 +22,7 @@ class Recharge extends React.Component {
   componentDidUpdate() {
     if (this.props.rechargeDone) {
       this.props.resetRecharge();
-      this.props.navigation.navigate('Home');
+      this.props.navigation.navigate('Starter');
     }
   }
 

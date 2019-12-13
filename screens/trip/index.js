@@ -1,3 +1,5 @@
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable no-underscore-dangle */
 import React from 'react';
 import MapView, { Polyline } from 'react-native-maps';
 import {
@@ -5,12 +7,18 @@ import {
   View,
   Text,
   StatusBar,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  BackHandler
 } from 'react-native';
+import { connect } from 'react-redux';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import Header from '../../components/Header';
 import Button from '../../components/Button';
+import LoadingIndicator from '../../components/LoadingIndicator';
+import Menu from '../../components/Menu';
+
+import * as tripActions from '../../actions/trip';
 
 const mapStyle = [
   {
@@ -253,21 +261,100 @@ const coordinates = [
   }
 ];
 
-export default class Home extends React.Component {
+let drawer;
+
+class Trip extends React.Component {
   state = {
     region: {
       latitude: 30.3524,
       longitude: 76.3612,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01
+    },
+    drawerVisible: false
+  };
+
+  _didFocusSubscription;
+
+  _willBlurSubscription;
+
+  constructor(props) {
+    super(props);
+    this._didFocusSubscription = props.navigation.addListener(
+      'didFocus',
+      payload => {
+        BackHandler.addEventListener(
+          'hardwareBackPress',
+          this.onBackButtonPressAndroid
+        );
+        this.props.getActiveTrip();
+      }
+    );
+  }
+
+  componentDidMount() {
+    this._willBlurSubscription = this.props.navigation.addListener(
+      'willBlur',
+      payload =>
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          this.onBackButtonPressAndroid
+        )
+    );
+  }
+
+  componentDidUpdate() {
+    if (this.props.tripEnded) {
+      this.props.resetTripScreen();
+      this.props.navigation.navigate('Home');
     }
+  }
+
+  componentWillUnmount() {
+    this._didFocusSubscription && this._didFocusSubscription.remove();
+    this._willBlurSubscription && this._willBlurSubscription.remove();
+  }
+
+  onBackButtonPressAndroid = () => {
+    if (drawer.state.visible) {
+      drawer.slideBack();
+    } else {
+      this.props.navigation.goBack();
+    }
+    return true;
+  };
+
+  setDrawerRef = drawerRef => {
+    drawer = drawerRef;
+  };
+
+  handleLockPress = () => {
+    if (this.props.locked) {
+      this.props.unlockCycle();
+    }
+    this.props.lockCycle();
+  };
+
+  handleEndPress = () => {
+    this.props.endTrip();
   };
 
   render() {
     return (
       <View style={styles.container}>
+        {this.props.loading ? <LoadingIndicator /> : null}
+        <Menu
+          ref={this.setDrawerRef}
+          drawerVisible={this.state.drawerVisible}
+        />
         <StatusBar animated hidden />
-        <Header leftIcon="ios-menu" headerText="Trip Details" />
+        <Header
+          leftIcon="ios-menu"
+          leftIconPress={() => {
+            drawer.slide();
+          }}
+          headerText="Trip Details"
+        />
         <View style={styles.mapContainer}>
           <MapView
             initialRegion={this.state.region}
@@ -297,24 +384,45 @@ export default class Home extends React.Component {
                   }}
                 >
                   <Text style={styles.smallText}>Start Time</Text>
-                  <Text style={styles.largeText}>09:55 AM</Text>
+                  <Text style={styles.largeText}>
+                    {this.props.activeTrip.start
+                      ? new Date(
+                          this.props.activeTrip.start
+                        ).toLocaleTimeString()
+                      : '--:--:-- --'}
+                  </Text>
                 </View>
 
                 <View style={styles.tripDetail}>
                   <Text style={styles.smallText}>End Time</Text>
-                  <Text style={styles.largeText}>--:-- --</Text>
+                  <Text style={styles.largeText}>
+                    {' '}
+                    {this.props.activeTrip.end
+                      ? new Date(this.props.activeTrip.end).toLocaleTimeString()
+                      : '--:--:-- --'}
+                  </Text>
                 </View>
               </View>
               <View style={styles.paymentDetails}>
                 <View style={styles.paymentItem}>
                   <Text style={styles.paymentItemName}>Trip Cost</Text>
-                  <Text style={styles.paymentItemPrice}>₹10</Text>
+                  <Text style={styles.paymentItemPrice}>
+                    ₹
+                    {this.props.activeTrip.fare
+                      ? this.props.activeTrip.fare
+                      : 0}
+                  </Text>
                 </View>
                 <View style={styles.paymentItem}>
                   <Text style={styles.paymentItemName}>
                     Available Wallet Balance
                   </Text>
-                  <Text style={styles.paymentItemPrice}>₹100</Text>
+                  <Text style={styles.paymentItemPrice}>
+                    ₹
+                    {this.props.profile.credits
+                      ? this.props.profile.credits
+                      : 0}
+                  </Text>
                 </View>
               </View>
               <TouchableWithoutFeedback
@@ -326,14 +434,12 @@ export default class Home extends React.Component {
               </TouchableWithoutFeedback>
             </View>
             <View styles={styles.buttons}>
-              <Button style={{ marginBottom: 20 }} text="Lock Cycle" />
               <Button
-                onPress={() => {
-                  this.props.navigation.navigate('Home');
-                }}
-                border
-                text="End Trip"
+                style={{ marginBottom: 20 }}
+                text={this.props.locked ? 'Unlock Cycle' : 'Lock Cycle'}
+                onPress={this.handleLockPress}
               />
+              <Button onPress={this.handleEndPress} border text="End Trip" />
             </View>
           </View>
         </LinearGradient>
@@ -341,6 +447,22 @@ export default class Home extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  loading: state.trip.loading,
+  error: state.trip.error,
+  errorMessage: state.trip.errorMessage,
+  activeTrip: state.trip.activeTrip,
+  tripEnded: state.trip.tripEnded,
+  locked: state.trip.locked,
+  profile: state.starter.profile
+});
+
+const mapDispatchToProps = {
+  ...tripActions
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Trip);
 
 const styles = StyleSheet.create({
   container: {

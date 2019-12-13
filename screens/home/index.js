@@ -493,7 +493,8 @@ const mapStateToProps = state => ({
   error: state.home.error,
   errorMessage: state.home.errorMessage,
   cycles: state.home.cycles,
-  activeCycle: state.home.activeCycle
+  activeCycle: state.home.activeCycle,
+  booked: state.home.booked
 });
 
 const mapDispatchToProps = {
