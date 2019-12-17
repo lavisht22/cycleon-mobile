@@ -21,7 +21,7 @@ function Navigation(props) {
         <Text style={styles.text}>Recharge Account</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => {
+        onPress={async () => {
           navigation.navigate('Start');
         }}
       >

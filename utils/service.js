@@ -74,6 +74,10 @@ export async function storeToken(token) {
   await storeAsyncData('token', token);
 }
 
+export async function clearToken() {
+  await storeAsyncData('token', null);
+}
+
 const storeAsyncData = async (key, value) => {
   try {
     await AsyncStorage.setItem(key, value);

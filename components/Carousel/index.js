@@ -41,7 +41,7 @@ export default class MailCarousel extends React.Component {
                 <Button
                   onPress={this.props.bookCycle}
                   text="Book"
-                  altText="₹10/-"
+                  altText={'₹' + this.props.selectedNum * 10 + '/-'}
                 />
               </View>
             );
