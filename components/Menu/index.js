@@ -65,7 +65,7 @@ class Menu extends React.Component {
               style={styles.profilePicture}
               source={require('../../assets/avatar.jpg')}
             />
-            <Text style={styles.text1}>Lavish Thakkar</Text>
+            <Text style={styles.text1}>{this.props.name}</Text>
           </View>
           <Navigation />
         </View>

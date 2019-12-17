@@ -8,13 +8,6 @@ function Navigation(props) {
     <View style={{ marginTop: 20, padding: 30 }}>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('Starter');
-        }}
-      >
-        <Text style={styles.text}>Home</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
           navigation.navigate('Rides');
         }}
       >

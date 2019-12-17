@@ -346,6 +346,11 @@ class Trip extends React.Component {
         <Menu
           ref={this.setDrawerRef}
           drawerVisible={this.state.drawerVisible}
+          name={
+            this.props.profile && this.props.profile.name
+              ? this.props.profile.name
+              : 'David Bowie'
+          }
         />
         <StatusBar animated hidden />
         <Header

@@ -387,6 +387,11 @@ class Home extends React.Component {
         <Menu
           ref={this.setDrawerRef}
           drawerVisible={this.state.drawerVisible}
+          name={
+            this.props.profile && this.props.profile.name
+              ? this.props.profile.name
+              : 'David Bowie'
+          }
         />
         <StatusBar animated hidden />
         <Header
@@ -494,7 +499,8 @@ const mapStateToProps = state => ({
   errorMessage: state.home.errorMessage,
   cycles: state.home.cycles,
   activeCycle: state.home.activeCycle,
-  booked: state.home.booked
+  booked: state.home.booked,
+  profile: state.starter.profile
 });
 
 const mapDispatchToProps = {
